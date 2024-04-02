@@ -180,7 +180,6 @@ class TaskManager:
         self.proxies = self.get_file_data('proxy.txt')
 
         self.lock = asyncio.Lock()
-        self.err = [1, 1]
     
     def get_file_data(self, path: str) -> list:
         with open(path, 'r') as file:
@@ -198,23 +197,15 @@ class TaskManager:
                 if self.keys:
                     key = self.get_key()
                 else:
-                    if self.err[0]:
-                        self.err[0] = 0
-                        return 'nokeys'
-                    else: 
-                        break
+                    return 'nokeys'
 
             if USE_PROXY:
                 async with self.lock:
                     if self.proxies:
                         proxy = self.get_proxy()
                     else:
-                        if self.err[1]:
-                            self.err[1] = 0
-                            return 'noproxy'
-                        else:
-                            self.keys.append(key)
-                            break
+                        self.keys.append(key)
+                        return 'noproxy'
             else:
                 proxy = None
             
